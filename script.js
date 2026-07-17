@@ -3,8 +3,8 @@ import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/l
 import { EffectComposer } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { ShaderPass } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/postprocessing/ShaderPass.js';
 import { FilmPass } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/postprocessing/FilmPass.js';
+import gsap from 'https://cdn.skypack.dev/gsap@3.9.1';
 
 // 1. Core State
 const State = { isRobotLoaded: false, isProcessing: false };
@@ -19,19 +19,20 @@ const Engine = {
         this.camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 50);
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.domElement.style.display = 'block';
         document.getElementById('canvas-container').appendChild(this.renderer.domElement);
 
         // --- Post Processing Stack (The "Cyber Look") ---
         this.composer = new EffectComposer(this.renderer);
-        
-        // 1. Base Render
+        // Base Render
         this.composer.addPass(new RenderPass(this.scene, this.camera));
 
-        // 2. Bloom (Intense Neon Glow)
-        this.composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.8, 0.4, 0.85));
+        // Bloom (Intense Neon Glow)
+        this.bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.8, 0.4, 0.85);
+        this.composer.addPass(this.bloomPass);
 
-        // 3. Film Grain/Scanlines (Cinematic texture)
+        // Film Grain/Scanlines (Cinematic texture)
         const filmPass = new FilmPass(0.35, 0.025, 648, false);
         this.composer.addPass(filmPass);
 
@@ -51,6 +52,19 @@ const Engine = {
                 gsap.to(this.robot.rotation, { y: mouseX * 0.5, x: -mouseY * 0.3, duration: 1 });
             }
         });
+
+        // Handle resize
+        window.addEventListener('resize', () => this.onWindowResize());
+    },
+    onWindowResize: function() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        if (this.composer && this.composer.setSize) this.composer.setSize(width, height);
+        if (this.bloomPass && this.bloomPass.setSize) this.bloomPass.setSize(width, height);
     },
     loadRobot: function(path) {
         const loader = new GLTFLoader();
@@ -66,13 +80,21 @@ const Engine = {
             gsap.from(this.robot.rotation, { y: Math.PI * 2, duration: 2, ease: "elastic.out(1, 0.5)" });
 
             State.isRobotLoaded = true;
-            document.getElementById('robot-status').innerText = "SYSTEM // ONLINE";
+            const statusEl = document.getElementById('robot-status');
+            if (statusEl) statusEl.innerText = "SYSTEM // ONLINE";
 
         }, undefined, (err) => console.error("Robot load failed:", err));
     },
     animate: function() {
         requestAnimationFrame(() => this.animate());
-        this.composer.render(); // Render with effects
+        // Idle animation
+        if (this.robot) this.robot.rotation.y += 0.002;
+        // Render via composer (postprocessing)
+        if (this.composer) {
+            this.composer.render();
+        } else {
+            this.renderer.render(this.scene, this.camera);
+        }
     }
 };
 
@@ -91,32 +113,37 @@ const UI = {
         // Animate cards in on load
         gsap.from(".card", { opacity: 0, y: 30, duration: 0.8, stagger: 0.2, ease: "power2.out" });
         gsap.from(".bubble", { opacity: 0, x: -30, duration: 1, delay: 1.5, ease: "back.out(1.7)" });
+
+        // Make sure bubble displays if robot loaded
+        const bubble = document.getElementById('robot-bubble');
+        if (bubble) bubble.style.display = State.isRobotLoaded ? 'block' : 'none';
     },
     onSend: function() {
-        const input = document.getElementById('chat-input').value;
+        const inputEl = document.getElementById('chat-input');
+        const input = inputEl ? inputEl.value : '';
         if(!input) return;
         const bubble = document.getElementById('robot-bubble');
         const btn = document.getElementById('send-btn');
 
-        bubble.innerText = "ANALYZING...";
-        bubble.style.display = 'block';
+        if (bubble) {
+            bubble.innerText = "ANALYZING...";
+            bubble.style.display = 'block';
+        }
         
         // Button click animation
-        gsap.to(btn, { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1 });
-        gsap.to(bubble, { opacity: 1, scale: 1.05, duration: 0.3, yoyo: true, repeat: 1 });
+        if (btn) gsap.to(btn, { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1 });
+        if (bubble) gsap.to(bubble, { opacity: 1, scale: 1.05, duration: 0.3, yoyo: true, repeat: 1 });
     },
     onReceive: function(text) {
         const bubble = document.getElementById('robot-bubble');
-        bubble.innerText = text;
-        
+        if (!bubble) return;
         // Typewriter effect simulation (simple)
-        const textElement = bubble;
         const originalText = text;
-        textElement.innerHTML = "";
+        bubble.innerHTML = "";
         let charIndex = 0;
         const typeInterval = setInterval(() => {
             if (charIndex < originalText.length) {
-                textElement.innerHTML += originalText.charAt(charIndex);
+                bubble.innerHTML += originalText.charAt(charIndex);
                 charIndex++;
             } else {
                 clearInterval(typeInterval);
@@ -132,11 +159,14 @@ Engine.animate();
 UI.init();
 
 // Hook Interaction to UI animations
-document.getElementById('send-btn').addEventListener('click', async () => {
-    if(State.isProcessing) return;
-    UI.onSend();
-    const response = await AI.sendMessage(document.getElementById('chat-input').value);
-    UI.onReceive(response);
-    State.isProcessing = false;
-});
-    
+const sendBtn = document.getElementById('send-btn');
+if (sendBtn) {
+    sendBtn.addEventListener('click', async () => {
+        if(State.isProcessing) return;
+        UI.onSend();
+        const inputVal = document.getElementById('chat-input') ? document.getElementById('chat-input').value : '';
+        const response = await AI.sendMessage(inputVal);
+        UI.onReceive(response);
+        State.isProcessing = false;
+    });
+}

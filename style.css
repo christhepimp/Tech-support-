@@ -2,17 +2,17 @@
     --neon-green: #00ff41;
     --neon-blue: #00f3ff;
     --dark-bg: #050505;
-    --glass-bg: rgba(20, 20, 20, 0.5);
+    --glass-bg: rgba(20, 20, 20, 0.55);
 }
 
-body {
+html, body {
     margin: 0;
+    padding: 0;
     background: var(--dark-bg);
     font-family: 'Courier New', monospace; /* Monospace = Tech */
     color: var(--neon-green);
-    overflow: hidden;
-    height: 100vh;
-    width: 100vw;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
 /* --- 3D Canvas Layer --- */
@@ -21,7 +21,11 @@ body {
     top: 0; left: 0;
     width: 100%; height: 100%;
     z-index: 1; /* Robot sits behind main UI but above background */
+    pointer-events: none;
 }
+
+/* Make the WebGL canvas always cover the container */
+#canvas-container canvas { width: 100% !important; height: 100% !important; display: block; }
 
 /* --- UI Container Layer --- */
 .container {
@@ -39,55 +43,63 @@ body {
 /* --- The Advanced Cyber Cards (Glassmorphism v2) --- */
 .card {
     background: var(--glass-bg);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(0, 255, 65, 0.2);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 255, 65, 0.05);
-    padding: 25px;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 255, 65, 0.18);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 255, 65, 0.04);
+    padding: 18px;
     border-radius: 8px;
-    margin-bottom: 20px;
-    max-width: 500px;
+    margin-bottom: 16px;
+    max-width: 680px;
+    width: calc(100% - 40px);
     pointer-events: all; /* Re-enable clicks for inputs/buttons */
-    transition: all 0.3s ease;
+    transition: all 0.18s ease;
 }
+
+.card.full { align-self: center; }
 
 .card:hover {
     border-color: var(--neon-green);
-    box-shadow: 0 0 25px rgba(0, 255, 65, 0.2), inset 0 0 10px rgba(0, 255, 65, 0.1);
+    box-shadow: 0 0 25px rgba(0, 255, 65, 0.16), inset 0 0 8px rgba(0, 255, 65, 0.08);
     transform: translateY(-2px);
 }
 
 .card h1 {
-    margin: 0 0 10px 0;
-    font-size: 1.8rem;
+    margin: 0 0 8px 0;
+    font-size: 1.4rem;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 1.6px;
     text-shadow: 0 0 5px var(--neon-green);
 }
 
 .card p {
     margin: 0;
     font-size: 0.9rem;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 /* --- Command Input Area --- */
 #support-card {
     display: flex;
     gap: 10px;
-    background: rgba(0,0,0,0.8); /* Darker input area for focus */
+    background: rgba(0,0,0,0.78); /* Darker input area for focus */
+    align-items: center;
 }
+
+.input-row { display: flex; width: 100%; gap: 10px; }
 
 #chat-input {
     flex-grow: 1;
     background: transparent;
     border: none;
-    border-bottom: 2px solid rgba(0, 255, 65, 0.3);
+    border-bottom: 2px solid rgba(0, 255, 65, 0.28);
     color: white;
     padding: 10px;
     font-family: inherit;
-    font-size: 1.1rem;
-    transition: border-color 0.3s;
+    font-size: 1.05rem;
+    transition: border-color 0.24s;
 }
+
+#chat-input::placeholder { color: rgba(255,255,255,0.5); }
 
 #chat-input:focus {
     outline: none;
@@ -98,19 +110,23 @@ body {
     background: transparent;
     border: 1px solid var(--neon-green);
     color: var(--neon-green);
-    padding: 10px 20px;
+    padding: 10px 14px;
     font-family: inherit;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.18s;
     text-transform: uppercase;
+    border-radius: 6px;
 }
 
 #send-btn:hover {
     background: var(--neon-green);
     color: var(--dark-bg);
-    box-shadow: 0 0 15px var(--neon-green);
+    box-shadow: 0 0 12px var(--neon-green);
 }
+
+/* Robot status */
+.status { margin-top: 10px; color: var(--neon-blue); font-weight: bold; }
 
 /* --- The Dynamic Robot Speech Bubble --- */
 .bubble {
@@ -121,28 +137,26 @@ body {
     background: rgba(0, 0, 0, 0.9);
     border: 1px solid var(--neon-blue);
     color: var(--neon-blue);
-    padding: 20px;
-    border-radius: 15px;
+    padding: 16px;
+    border-radius: 12px;
     font-size: 0.9rem;
     z-index: 3;
-    box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px rgba(0, 243, 255, 0.2);
+    box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px rgba(0, 243, 255, 0.16);
     display: none; /* Hidden until AI responds */
     pointer-events: none;
-    /* Speech triangle */
 }
 
 .bubble::after {
     content: '';
     position: absolute;
-    bottom: -10px;
-    left: 20px;
-    border-width: 10px 10px 0;
+    bottom: -8px;
+    left: 18px;
+    border-width: 8px 8px 0;
     border-style: solid;
     border-color: rgba(0, 0, 0, 0.9) transparent transparent;
 }
 
 /* --- Background FX (Scanlines & Grid) --- */
-/* Scanline Overlay */
 body::after {
     content: "";
     position: fixed;
@@ -150,24 +164,23 @@ body::after {
     width: 100vw; height: 100vh;
     background: repeating-linear-gradient(
         0deg,
-        rgba(0, 0, 0, 0.15),
-        rgba(0, 0, 0, 0.15) 1px,
+        rgba(0, 0, 0, 0.12),
+        rgba(0, 0, 0, 0.12) 1px,
         transparent 1px,
         transparent 2px
     );
     pointer-events: none;
     z-index: 99; /* On top of everything */
-    opacity: 0.5;
+    opacity: 0.45;
 }
 
-/* Subtle Grid */
 body::before {
     content: "";
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background-image: radial-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
+    background-image: radial-gradient(rgba(0, 255, 65, 0.08) 1px, transparent 1px);
+    background-size: 48px 48px;
     pointer-events: none;
     z-index: 0;
 }
@@ -176,23 +189,26 @@ body::before {
 @media (max-width: 768px) {
     .container {
         justify-content: flex-end; /* Keep UI at bottom for thumbs */
-        padding: 10px;
+        padding: 12px;
     }
     
     .card {
         width: 100%;
         margin-bottom: 10px;
-        padding: 15px;
+        padding: 12px;
     }
 
+    .card h1 { font-size: 1.1rem; }
+
     .bubble {
-        top: auto; bottom: 150px; /* Move bubble above UI on mobile */
-        right: 10px; left: 10px;
+        top: auto; bottom: 160px; /* Move bubble above UI on mobile */
+        right: 12px; left: 12px;
         max-width: none;
     }
     
-    #canvas-container {
-        opacity: 0.6; /* Lower opacity on mobile to aid readability */
-    }
-  }
-  
+    #canvas-container { opacity: 0.55; }
+}
+
+@media (min-width: 1200px) {
+    .card { max-width: 960px; }
+}
