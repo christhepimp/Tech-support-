@@ -1,0 +1,198 @@
+:root {
+    --neon-green: #00ff41;
+    --neon-blue: #00f3ff;
+    --dark-bg: #050505;
+    --glass-bg: rgba(20, 20, 20, 0.5);
+}
+
+body {
+    margin: 0;
+    background: var(--dark-bg);
+    font-family: 'Courier New', monospace; /* Monospace = Tech */
+    color: var(--neon-green);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* --- 3D Canvas Layer --- */
+#canvas-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1; /* Robot sits behind main UI but above background */
+}
+
+/* --- UI Container Layer --- */
+.container {
+    position: relative;
+    z-index: 2;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Push content to bottom by default */
+    padding: 20px;
+    box-sizing: border-box;
+    pointer-events: none; /* Let clicks pass through empty space */
+}
+
+/* --- The Advanced Cyber Cards (Glassmorphism v2) --- */
+.card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 255, 65, 0.2);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 255, 65, 0.05);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    max-width: 500px;
+    pointer-events: all; /* Re-enable clicks for inputs/buttons */
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 25px rgba(0, 255, 65, 0.2), inset 0 0 10px rgba(0, 255, 65, 0.1);
+    transform: translateY(-2px);
+}
+
+.card h1 {
+    margin: 0 0 10px 0;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px var(--neon-green);
+}
+
+.card p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* --- Command Input Area --- */
+#support-card {
+    display: flex;
+    gap: 10px;
+    background: rgba(0,0,0,0.8); /* Darker input area for focus */
+}
+
+#chat-input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(0, 255, 65, 0.3);
+    color: white;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    transition: border-color 0.3s;
+}
+
+#chat-input:focus {
+    outline: none;
+    border-color: var(--neon-blue); /* Focus color changes to blue */
+}
+
+#send-btn {
+    background: transparent;
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+    padding: 10px 20px;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+#send-btn:hover {
+    background: var(--neon-green);
+    color: var(--dark-bg);
+    box-shadow: 0 0 15px var(--neon-green);
+}
+
+/* --- The Dynamic Robot Speech Bubble --- */
+.bubble {
+    position: fixed;
+    top: 40px; /* Positioned top-right for desktop */
+    right: 40px;
+    max-width: 300px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid var(--neon-blue);
+    color: var(--neon-blue);
+    padding: 20px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    z-index: 3;
+    box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px rgba(0, 243, 255, 0.2);
+    display: none; /* Hidden until AI responds */
+    pointer-events: none;
+    /* Speech triangle */
+}
+
+.bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 20px;
+    border-width: 10px 10px 0;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.9) transparent transparent;
+}
+
+/* --- Background FX (Scanlines & Grid) --- */
+/* Scanline Overlay */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 99; /* On top of everything */
+    opacity: 0.5;
+}
+
+/* Subtle Grid */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: radial-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* --- Responsive Adjustments (Mobile First) --- */
+@media (max-width: 768px) {
+    .container {
+        justify-content: flex-end; /* Keep UI at bottom for thumbs */
+        padding: 10px;
+    }
+    
+    .card {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 15px;
+    }
+
+    .bubble {
+        top: auto; bottom: 150px; /* Move bubble above UI on mobile */
+        right: 10px; left: 10px;
+        max-width: none;
+    }
+    
+    #canvas-container {
+        opacity: 0.6; /* Lower opacity on mobile to aid readability */
+    }
+  }
+  
