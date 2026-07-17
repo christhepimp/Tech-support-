@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cyber-Sentinel // 3D Command</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Load Three.js and GLTF Loader for the Robot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="card full">
+            <h1>Global Tech Command</h1>
+            <p>Your 24/7 support squad. No bots, just real help.</p>
+        </div>
+        
+        <!-- UI Card -->
+        <div class="card" id="support-card">
+            <h2>Live Support Feed</h2>
+            <p>Drop your tech issue below.</p>
+        </div>
+    </div>
+    
+    <!-- Speech Bubble for Robot -->
+    <div id="robot-bubble" class="bubble">"Hey, no cap, need some help?"</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
