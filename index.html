@@ -3,35 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cyber-Sentinel // 3D Command</title>
+    <title>Cyber-Sentinel // 24/7 Tech Command Center</title>
     <link rel="stylesheet" href="style.css">
-    <!-- script.js is an ES module and imports dependencies (three, loaders, gsap, etc.) -->
 </head>
 <body>
+    <!-- 3D Canvas Container -->
     <div id="canvas-container"></div>
     
+    <!-- Background Grid Effect -->
+    <div class="grid-overlay"></div>
+    
+    <!-- Main Content Container -->
     <div class="container">
-        <!-- Hero Section -->
-        <div class="card full">
-            <h1>Global Tech Command</h1>
-            <p>Your 24/7 support squad. No bots, just real help.</p>
-            <div id="robot-status" class="status">SYSTEM // OFFLINE</div>
-        </div>
-        
-        <!-- UI Card -->
-        <div class="card" id="support-card">
-            <h2>Live Support Feed</h2>
-            <p>Drop your tech issue below.</p>
-            <div class="input-row">
-                <input id="chat-input" type="text" placeholder="Describe your issue..." />
-                <button id="send-btn">Send</button>
+        <!-- HERO / INTRO SECTION -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="intro-text">
+                    <h1 class="hero-title">CYBER-SENTINEL</h1>
+                    <div class="title-subtext">GLOBAL TECH COMMAND CENTER</div>
+                    <p class="hero-subtitle">Your 24/7 Emergency Response Squad. Real Humans. Real Solutions. Lightning Fast.</p>
+                </div>
             </div>
+        </section>
+
+        <!-- SERVICES GRID -->
+        <section class="services-section">
+            <h2 class="section-title">LIVE SUPPORT OPERATIONS</h2>
+            <div class="services-grid">
+                <div class="service-card" data-service="computers">
+                    <div class="service-icon">💻</div>
+                    <h3>COMPUTERS & LAPTOPS</h3>
+                    <p>Virus removal • Hardware issues • Software crashes • Performance boost</p>
+                </div>
+                <div class="service-card" data-service="phones">
+                    <div class="service-icon">📱</div>
+                    <h3>SMARTPHONES & TABLETS</h3>
+                    <p>Slow performance • App crashes • Battery drain • Screen issues</p>
+                </div>
+                <div class="service-card" data-service="tv">
+                    <div class="service-icon">📺</div>
+                    <h3>SMART TVS & STREAMING</h3>
+                    <p>Connection issues • App errors • Remote problems • Setup help</p>
+                </div>
+                <div class="service-card" data-service="security">
+                    <div class="service-icon">🔒</div>
+                    <h3>CYBER THREAT ALERTS</h3>
+                    <p>Malware detection • Phishing warnings • Account security • Data breach alerts</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- THREAT FEED / TRENDING THREATS -->
+        <section class="threats-section">
+            <h2 class="section-title">⚠️ ACTIVE CYBER THREATS</h2>
+            <div class="threat-ticker">
+                <div class="threat-item alert-critical">
+                    <span class="threat-level">CRITICAL</span>
+                    <span class="threat-text">New ransomware campaign targeting small businesses via email</span>
+                    <span class="threat-time">2 hours ago</span>
+                </div>
+                <div class="threat-item alert-high">
+                    <span class="threat-level">HIGH</span>
+                    <span class="threat-text">Widespread phishing attempts impersonating PayPal and banking apps</span>
+                    <span class="threat-time">4 hours ago</span>
+                </div>
+                <div class="threat-item alert-medium">
+                    <span class="threat-level">MEDIUM</span>
+                    <span class="threat-text">Router vulnerability discovered - update firmware immediately</span>
+                    <span class="threat-time">6 hours ago</span>
+                </div>
+                <div class="threat-item alert-high">
+                    <span class="threat-level">HIGH</span>
+                    <span class="threat-text">Popular streaming apps compromised with trojan malware</span>
+                    <span class="threat-time">8 hours ago</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN SUPPORT INTERFACE -->
+        <section class="support-section">
+            <div class="card full" id="main-card">
+                <h2>DISPATCH YOUR ISSUE</h2>
+                <p>Describe your problem and our AI-powered routing system will connect you with the right tech expert instantly.</p>
+                
+                <div class="input-group">
+                    <div class="input-row">
+                        <input id="chat-input" type="text" placeholder="e.g., My computer keeps crashing... My phone won't charge... My TV won't connect..." />
+                        <button id="send-btn" class="send-button">
+                            <span>SUBMIT</span>
+                            <span class="send-icon">→</span>
+                        </button>
+                    </div>
+                    <div class="input-status" id="input-status"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SYSTEM STATUS -->
+        <section class="status-bar">
+            <div class="status-item">
+                <span class="status-label">SYSTEM STATUS:</span>
+                <span id="robot-status" class="status-value">● OFFLINE</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">ACTIVE OPERATORS:</span>
+                <span class="status-value">● 47</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">AVG RESPONSE TIME:</span>
+                <span class="status-value">● 2m 34s</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">UPTIME:</span>
+                <span class="status-value">● 99.8%</span>
+            </div>
+        </section>
+    </div>
+
+    <!-- ROBOT SPEECH BUBBLE -->
+    <div id="robot-bubble" class="bubble">
+        <div class="bubble-content">
+            <div class="bubble-text">"Hey there! Ready to tackle that tech problem? I'm standing by with the full team!"</div>
+            <div class="bubble-indicator">🤖 AI-Router</div>
         </div>
     </div>
-    
-    <!-- Speech Bubble for Robot -->
-    <div id="robot-bubble" class="bubble">"Hey, no cap, need some help?"</div>
 
+    <!-- Notifications Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Load Three.js and custom script -->
     <script type="module" src="script.js"></script>
 </body>
 </html>
